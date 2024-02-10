@@ -1,30 +1,43 @@
-# React + TypeScript + Vite
+# VacationAllocator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+VacationAllocator is a React application designed to help users plan their vacation time allocation in a time. It takes into account weekends and bank holidays (currently hard coded) to ensure that the allocated days off are distributed evenly throughout the year.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Date Range Selection**: Users can input a start and end date to define the period for which they want to allocate vacation days.
+- **Bank Holidays**: The application considers bank holidays as non-working days and excludes them from the vacation allocation.
+- **Weekends Off**: By default, weekends are considered as days off and are not included in the vacation allocation.
+- **Customizable Days Available**: Users can specify how many days they have available for vacation, and the application will distribute these days accordingly.
+- **Visual Calendar**: Once the vacation days are calculated, a visual calendar displays the allocated days off, allowing users to see their vacation schedule at a glance.
 
-## Expanding the ESLint configuration
+## Future Improvements
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Set custom bank holidays**: Allow users to set their own bank holidays.
+- **Customizable weekends**: Allow users to specify which days are considered weekends, if any.
+- **Better UI/UX**: Improve the user interface and experience to make the application more intuitive and user-friendly.
+- **Better allocation of days off**: Improve the algorithm for allocating days off to ensure that they are distributed as evenly as possible throughout the year. For example, prioritize longer vacation periods over shorter ones.
+- **Change allocated days off**: Allow users to change the allocated days off manually, if necessary.
 
-- Configure the top-level `parserOptions` property like this:
+## Usage
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+1. Open the application in a web browser.
+2. Enter the desired start and end dates for the vacation period.
+3. Specify the number of days available for vacation.
+4. Click the submit button to calculate the vacation days.
+5. View the allocated days off on the calendar.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Development
+
+To run the application locally for development purposes, follow these steps:
+
+1. Clone the repository.
+2. Install dependencies with `npm install`.
+3. Start the development server with `npm start`.
+
+## Contributing
+
+Contributions are welcome! Please feel free to open issues or pull requests to improve the application.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.

@@ -7,11 +7,15 @@ VacationAllocator is an application designed to help users plan their vacation d
 - **Public Holidays by Country Code**: Users can select the country code for which they want to allocate vacation days. The public holidays are fetch from an external [https://date.nager.at/](API).
 - **Customize public holidays**: Users can customize the public holidays by adding or removing specific dates.
 
-## Future Improvements
+## To do
 
-- **Customizable weekends**: Allow users to specify which days are considered weekends, if any.
+- **Deployment**: Deploy the application to a server to make it accessible to the public
+- **Automatic tests**: Add automatic tests to ensure the application works as expected
+- **API alternative**: Find an alternative API to fetch public holidays
+- **Customizable public holidays**: Allow users to specify which days are considered public holidays
 - **Better UI/UX**: Improve the user interface and experience to make the application more intuitive and user-friendly.
-- **Better allocation of days off**: Improve the algorithm for allocating days off to ensure that they are distributed as evenly as possible throughout the year. For example, prioritize longer vacation periods over shorter ones.
+- **Better allocation of days off**: Improve the algorithm for allocating days off
+- **Show consecutive days off**: Show the number of consecutive days off for each allocation
 
 ## Development
 

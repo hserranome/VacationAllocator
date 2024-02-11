@@ -69,8 +69,8 @@ export const Calendar = ({ year, publicHolidays, daysOff = [], onDayClick, maxDa
 			const baseClassNames = "cursor-pointer";
 			if (isDateDayOff(date)) return `${baseClassNames} bg-amber-500 text-white`;
 			if (isDatePublicHoliday(date)) return `${baseClassNames} bg-red-500 text-white`;
-			if (isWeekendDay(date)) return `${baseClassNames} bg-gray-100 text-gray-600`;
-			return baseClassNames;
+			if (isWeekendDay(date)) return `${baseClassNames} bg-gray-100 text-gray-700`;
+			return `${baseClassNames} text-gray-700`;
 		},
 		[isDatePublicHoliday, isDateDayOff]
 	);
@@ -85,15 +85,15 @@ export const Calendar = ({ year, publicHolidays, daysOff = [], onDayClick, maxDa
 		<div className=" bg-white p-12 rounded-lg shadow-md text-center w-auto ">
 			<div className="mb-8 md:flex text-left">
 				<div className="mr-8 mb-3 md:mb-0">
-					<span className="font-semibold text-lg">Allocated days off:</span>
+					<span className="font-semibold text-lg text-gray-700">Allocated days off:</span>
 					<span className="p-1 ml-2 text-lg bg-amber-500 text-white">{allocatedDaysOff}</span>
 				</div>
 				<div className="mr-8 mb-3 md:mb-0">
-					<span className="font-semibold text-lg">Remaining days off:</span>
+					<span className="font-semibold text-lg text-gray-700">Remaining days off:</span>
 					<span className="p-1 ml-2 text-lg bg-blue-400 text-white">{remainingDaysOff}</span>
 				</div>
 				<div className="mr-8 mb-3 md:mb-0">
-					<span className="font-semibold text-lg">Bank holidays:</span>
+					<span className="font-semibold text-lg text-gray-700">Bank holidays:</span>
 					<span className="p-1 ml-2 text-lg bg-red-500 text-white">{publicHolidaysCount}</span>
 				</div>
 			</div>
@@ -102,7 +102,7 @@ export const Calendar = ({ year, publicHolidays, daysOff = [], onDayClick, maxDa
 				{months.map((month) => {
 					return (
 						<div key={`${month.toISOString()}-month`} className="">
-							<h3 className="text-xl font-bold">
+							<h3 className="text-xl font-bold text-gray-700">
 								{month.toLocaleString("default", { month: "long" })} {month.getFullYear()}
 							</h3>
 							<div className="mx-auto">

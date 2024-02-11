@@ -28,7 +28,7 @@ const Input = ({ label, type, register, error, name, options }) => {
 	return (
 		<div className="mb-2">
 			<label>
-				<p className="font-medium text-base mb-1">{label}</p>
+				<p className="font-medium text-base mb-1 text-gray-800">{label}</p>
 				<input className={inputClassNames} type={type} {...register(name, options)} />
 				{error && <span className="text-red-500 text-sm">This field is required</span>}
 			</label>

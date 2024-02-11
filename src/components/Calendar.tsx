@@ -83,16 +83,16 @@ export const Calendar = ({ year, publicHolidays, daysOff = [], onDayClick, maxDa
 
 	return (
 		<div className=" bg-white p-12 rounded-lg shadow-md text-center w-auto ">
-			<div className="mb-8 flex text-left">
-				<div className="mr-8">
+			<div className="mb-8 md:flex text-left">
+				<div className="mr-8 mb-3 md:mb-0">
 					<span className="font-semibold text-lg">Allocated days off:</span>
 					<span className="p-1 ml-2 text-lg bg-amber-500 text-white">{allocatedDaysOff}</span>
 				</div>
-				<div className="mr-8">
+				<div className="mr-8 mb-3 md:mb-0">
 					<span className="font-semibold text-lg">Remaining days off:</span>
 					<span className="p-1 ml-2 text-lg bg-blue-400 text-white">{remainingDaysOff}</span>
 				</div>
-				<div>
+				<div className="mr-8 mb-3 md:mb-0">
 					<span className="font-semibold text-lg">Bank holidays:</span>
 					<span className="p-1 ml-2 text-lg bg-red-500 text-white">{publicHolidaysCount}</span>
 				</div>

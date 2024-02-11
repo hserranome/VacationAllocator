@@ -18,10 +18,11 @@ const Input = ({ label, type, register, error, name, options }) => {
 	const inputClassNames = useMemo(() => {
 		const typeClassNames = {
 			checkbox: "w-5 h-5",
-			date: "w-48",
-			number: "w-48",
+			date: "w-36",
+			number: "w-36",
+			string: "w-36",
 		};
-		return `text-sm rounded-lg block py-2 px-4 border border-gray-400 ${typeClassNames[type]}`;
+		return `text-sm rounded-lg block h-10 px-4 mr-4 border border-gray-400 ${typeClassNames[type]}`;
 	}, [type]);
 
 	return (
@@ -45,34 +46,36 @@ export const SetupControls = ({ onSubmit }: { onSubmit: SubmitHandler<SetupInput
 	});
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)}>
-			<Input
-				label="Year"
-				type="number"
-				register={register}
-				name="year"
-				options={{ required: true, min: 2000, max: 2030 }}
-				error={errors.year}
-			/>
-			<Input
-				label="Days Available"
-				type="number"
-				register={register}
-				name="daysAvailable"
-				options={{ required: true }}
-				error={errors.daysAvailable}
-			/>
-			<Input
-				label="Country Code"
-				type="string"
-				register={register}
-				name="countryCode"
-				options={{ required: true }}
-				error={errors.countryCode}
-			/>
-			<div className="mt-5">
-				<input type="submit" value="Submit" className="bg-blue-500 text-white rounded-lg py-2 px-6" />
-			</div>
-		</form>
+		<div>
+			<form onSubmit={handleSubmit(onSubmit)} className="md:flex items-end">
+				<Input
+					label="Year"
+					type="number"
+					register={register}
+					name="year"
+					options={{ required: true, min: 2000, max: 2030 }}
+					error={errors.year}
+				/>
+				<Input
+					label="Days Available"
+					type="number"
+					register={register}
+					name="daysAvailable"
+					options={{ required: true }}
+					error={errors.daysAvailable}
+				/>
+				<Input
+					label="Country Code"
+					type="string"
+					register={register}
+					name="countryCode"
+					options={{ required: true }}
+					error={errors.countryCode}
+				/>
+				<div className="mb-2 mt-4 md:ml-2 md:mt-0">
+					<input type="submit" value="Submit" className="bg-blue-500 text-white rounded-lg h-10 px-6 w-36 text-sm" />
+				</div>
+			</form>
+		</div>
 	);
 };

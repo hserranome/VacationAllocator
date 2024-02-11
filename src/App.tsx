@@ -24,7 +24,7 @@ const App = () => {
 	);
 
 	return (
-		<div className="bg-red-100 p-8 text-gray-700 min-h-screen h-fit pb-28">
+		<div className="bg-red-50 p-8 text-gray-700 min-h-screen h-fit pb-28">
 			<div className="container mx-auto pt-24 px-4 mb-12 text-left max-w-3xl">
 				<div>
 					<h1 className="text-4xl font-bold text-gray-700	mb-8">Vacation Planner</h1>

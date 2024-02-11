@@ -24,15 +24,16 @@ const App = () => {
 	);
 
 	return (
-		<div className="bg-red-100 p-8 text-gray-800 min-h-screen h-fit pb-28">
+		<div className="bg-red-100 p-8 text-gray-700 min-h-screen h-fit pb-28">
 			<div className="container mx-auto pt-24 px-4 mb-12 text-left max-w-3xl">
 				<div>
-					<h1 className="text-4xl font-bold text-gray-800	mb-8">Vacation Planner</h1>
-					<p className="mb-8">
-						Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere asperiores cupiditate voluptates iste dolor
-						quos quisquam nemo modi? Temporibus exercitationem labore corrupti porro? Voluptas illum dignissimos sequi,
-						error in ad!
-					</p>
+					<h1 className="text-4xl font-bold text-gray-700	mb-8">Vacation Planner</h1>
+					<div className="mb-8 font-medium text-gray-700">
+						<p>
+							Enter the data to get a distribution of days off so we have as many consecutive days off as possible,
+							while using the less amount of given available days.
+						</p>
+					</div>
 				</div>
 
 				<div className="border-b-2 border-zinc-800/10 mb-8"></div>

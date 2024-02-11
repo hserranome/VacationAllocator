@@ -3,14 +3,10 @@ import { useCallback, useMemo } from "react";
 import { WeekdayHeaderRow } from ".";
 import { DAYS_IN_WEEK } from "../constants";
 
-const generateMonthRange = (start: Date, end: Date): Date[] => {
-	if (start > end) return [];
-	const nextMonth = new Date(start.getFullYear(), start.getMonth() + 1);
-	return [new Date(start), ...generateMonthRange(nextMonth, end)];
-};
-
-const filterDatesInDateRange = (allDates: Date[], rangeStart: Date, rangeEnd: Date) => {
-	return allDates.filter((singleDate) => singleDate >= rangeStart && singleDate <= rangeEnd);
+const generateYearMonths = (year: number): Date[] => {
+	if (!year) return [];
+	const months = Array.from({ length: 12 }).map((_, i) => new Date(year, i, 1));
+	return months;
 };
 
 const generateMonthCalendarCells = (month: Date) => {
@@ -18,9 +14,14 @@ const generateMonthCalendarCells = (month: Date) => {
 	const firstDayOfWeek = firstDayOfWeekIndex === 0 ? 6 : firstDayOfWeekIndex - 1;
 
 	const totalDaysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+
+	const lastDayOfWeekIndex = new Date(month.getFullYear(), month.getMonth(), totalDaysInMonth).getDay();
+	const lastDayOfWeek = lastDayOfWeekIndex === 0 ? 6 : lastDayOfWeekIndex - 1;
+
 	const calendarCells = [
 		...Array.from({ length: firstDayOfWeek }).map(() => null),
 		...Array.from({ length: totalDaysInMonth }).map((_, i) => i + 1),
+		...Array.from({ length: 6 - lastDayOfWeek }).map(() => null),
 	];
 	return calendarCells;
 };
@@ -44,77 +45,95 @@ const constructDateFromMonthAndDay = (baseMonth: Date, dayOfMonth: number): Date
 	return new Date(baseMonth.getFullYear(), baseMonth.getMonth(), dayOfMonth);
 };
 
-type CalendarProps = {
-	startDate: Date;
-	endDate: Date;
-	bankHolidays: Date[];
-	daysOff: Date[];
-};
-
 const isWeekendDay = (date: Date) => {
 	const day = date.getDay();
 	return day === 0 || day === 6;
 };
 
-export const Calendar = ({ startDate, endDate, bankHolidays, daysOff = [] }: CalendarProps) => {
-	const monthsInRange: Date[] = useMemo(() => generateMonthRange(startDate, endDate), [startDate, endDate]);
-	const bankHolidaysInRange = useMemo(
-		() => filterDatesInDateRange(bankHolidays, startDate, endDate),
-		[startDate, endDate, bankHolidays]
-	);
+type CalendarProps = {
+	year: number;
+	publicHolidays: Date[];
+	daysOff: Date[];
+	maxDaysOff: number;
+	onDayClick: (date: Date) => void;
+};
 
-	const isDateBankHoliday = useCallback(
-		(date: Date) => dateIsInArray(date, bankHolidaysInRange),
-		[bankHolidaysInRange]
-	);
+export const Calendar = ({ year, publicHolidays, daysOff = [], onDayClick, maxDaysOff }: CalendarProps) => {
+	const months: Date[] = useMemo(() => generateYearMonths(year), [year]);
+
+	const isDatePublicHoliday = useCallback((date: Date) => dateIsInArray(date, publicHolidays), [publicHolidays]);
 	const isDateDayOff = useCallback((date: Date) => dateIsInArray(date, daysOff), [daysOff]);
 
 	const getClassNamesForDate = useCallback(
 		(date: Date) => {
-			const classNames = [];
-			if (isDateBankHoliday(date)) classNames.push("bankHoliday");
-			if (isDateDayOff(date)) classNames.push("dayOff");
-			if (isWeekendDay(date)) classNames.push("weekend");
-			return classNames.join(" ");
+			const baseClassNames = "cursor-pointer";
+			if (isDateDayOff(date)) return `${baseClassNames} bg-amber-500 text-white`;
+			if (isDatePublicHoliday(date)) return `${baseClassNames} bg-red-500 text-white`;
+			if (isWeekendDay(date)) return `${baseClassNames} bg-gray-100 text-gray-600`;
+			return baseClassNames;
 		},
-		[isDateBankHoliday, isDateDayOff]
+		[isDatePublicHoliday, isDateDayOff]
 	);
 
+	const allocatedDaysOff = useMemo(() => daysOff.length, [daysOff]);
+	const publicHolidaysCount = useMemo(() => publicHolidays.length, [publicHolidays]);
+	const remainingDaysOff = useMemo(() => maxDaysOff - allocatedDaysOff, [maxDaysOff, allocatedDaysOff]);
+
+	const handleDayClick = useCallback((date: Date) => onDayClick(date), [onDayClick]);
+
 	return (
-		<div className="calendar">
-			{monthsInRange.map((month) => {
-				return (
-					<div key={`${month.toISOString()}-month`}>
-						<h3 className="monthLabel">
-							{month.toLocaleString("default", { month: "long" })} {month.getFullYear()}
-						</h3>
-						<div>
-							<table>
-								<tbody>
-									<WeekdayHeaderRow />
-									{splitArrayIntoChunks(generateMonthCalendarCells(month), DAYS_IN_WEEK).map((week, i) => {
-										return (
-											<tr key={`${month.toISOString()}-${i}-week`}>
-												{week.map((day, i) => {
-													const date = constructDateFromMonthAndDay(month, day);
-													return (
-														<td
-															key={`${date.toISOString()}-${i}-day`}
-															className={`day ${day ? getClassNamesForDate(date) : null}`}
-														>
-															{day}
-														</td>
-													);
-												})}
-											</tr>
-										);
-									})}
-								</tbody>
-							</table>
+		<div className=" bg-white p-12 rounded-lg shadow-md text-center w-auto ">
+			<div className="mb-8 flex text-left">
+				<div className="mr-8">
+					<span className="font-semibold text-lg">Allocated days off:</span>
+					<span className="p-1 ml-2 text-lg bg-amber-500 text-white">{allocatedDaysOff}</span>
+				</div>
+				<div className="mr-8">
+					<span className="font-semibold text-lg">Remaining days off:</span>
+					<span className="p-1 ml-2 text-lg bg-blue-400 text-white">{remainingDaysOff}</span>
+				</div>
+				<div>
+					<span className="font-semibold text-lg">Bank holidays:</span>
+					<span className="p-1 ml-2 text-lg bg-red-500 text-white">{publicHolidaysCount}</span>
+				</div>
+			</div>
+
+			<div className="grid lg:grid-cols-3 sm:grid-cols-1 md:grid-cols-2 gap-8 gap-y-12">
+				{months.map((month) => {
+					return (
+						<div key={`${month.toISOString()}-month`} className="">
+							<h3 className="text-xl font-bold">
+								{month.toLocaleString("default", { month: "long" })} {month.getFullYear()}
+							</h3>
+							<div className="mx-auto">
+								<table className="w-full">
+									<tbody>
+										<WeekdayHeaderRow />
+										{splitArrayIntoChunks(generateMonthCalendarCells(month), DAYS_IN_WEEK).map((week, i) => {
+											return (
+												<tr key={`${month.toISOString()}-${i}-week`} className="text-center flex">
+													{week.map((day, i) => {
+														const date = constructDateFromMonthAndDay(month, day);
+														return (
+															<td
+																key={`${date.toISOString()}-${i}-day`}
+																className={`flex-1 ${day ? getClassNamesForDate(date) : null}`}
+																onClick={day ? () => handleDayClick(date) : null}
+															>
+																{day}
+															</td>
+														);
+													})}
+												</tr>
+											);
+										})}
+									</tbody>
+								</table>
+							</div>
 						</div>
-					</div>
-				);
-			})}
+					);
+				})}
+			</div>
 		</div>
 	);
 };

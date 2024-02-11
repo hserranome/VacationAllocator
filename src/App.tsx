@@ -1,114 +1,66 @@
-import { useEffect, useMemo, useState } from "react";
 import "./App.css";
-import { ACTUAL_DATE, BANK_HOLIDAYS } from "./constants";
+import { INITIAL_PARAMETERS } from "./constants";
 import { Calendar, SetupControls } from "./components";
-import { DateTime, Interval } from "luxon";
-
-const calculateDaysOff = async (
-	startDate: Date,
-	endDate: Date,
-	bankHolidays: Date[],
-	daysToAllocate: number
-	// weekendsFree = true
-): Promise<Date[]> => {
-	const intervalStart = DateTime.fromJSDate(startDate);
-	const intervalEnd = DateTime.fromJSDate(endDate);
-	const fullRangeInterval = Interval.fromDateTimes(intervalStart, intervalEnd);
-
-	const weekendDays = fullRangeInterval
-		.splitBy({ days: 1 })
-		.filter((day) => day.start.weekday > 5)
-		.map((d) => d.start);
-
-	const bankHolidaysDates = bankHolidays
-		.map((date) => DateTime.fromJSDate(date))
-		.filter((date) => fullRangeInterval.contains(date));
-
-	const forcedDaysOff = [...weekendDays, ...bankHolidaysDates].sort((a, b) => a.toMillis() - b.toMillis());
-	const daysForPairs = [intervalStart.minus({ days: 1 }), ...forcedDaysOff, intervalEnd.plus({ days: 1 })];
-
-	const intervalBetweenDays = daysForPairs.reduce((acc, date, index, array) => {
-		if (index === 0) return acc;
-		const previousDate = array[index - 1];
-		const interval = Interval.fromDateTimes(previousDate.startOf("day"), date.startOf("day"));
-		return [...acc, interval];
-	}, []);
-
-	const arrayOfDatesBetween = intervalBetweenDays
-		.reduce((acc, interval) => {
-			const [, ...dates] = interval.splitBy({ days: 1 }).map((d) => d.start);
-			return [...acc, dates];
-		}, [])
-		.filter((d) => d.length !== 0)
-		.sort((a, b) => a.length - b.length);
-
-	const datesToAllocate = arrayOfDatesBetween
-		.reduce((acc, dates) => {
-			const remainingDays = daysToAllocate - acc.length;
-			const datesToAllocate = dates.slice(0, remainingDays);
-			return [...acc, ...datesToAllocate];
-		}, [])
-		.sort((a, b) => a.toMillis() - b.toMillis());
-
-	return datesToAllocate.map((d) => d.toJSDate());
-};
+import { useVacationPlanner } from "./utils";
+import { useMemo } from "react";
 
 const App = () => {
-	const [loading, setLoading] = useState<boolean>(false);
-	const [parameters, setParameters] = useState<{
-		startDate: Date;
-		endDate: Date;
-		daysAvailable: number;
-	}>(null);
-	const [daysOff, setDaysOff] = useState<Date[]>([]);
+	const { loading, parameters, setParameters, daysOff, setDaysOff, publicHolidays } =
+		useVacationPlanner(INITIAL_PARAMETERS);
 
-	const handleSubmit = async (data) => {
-		setLoading(true);
-		setParameters({
-			startDate: new Date(data.startDate),
-			endDate: new Date(data.endDate),
-			daysAvailable: data.daysAvailable,
+	const handleDayClick = (date: Date) => {
+		setDaysOff((prev) => {
+			if (prev.some((d) => d.toISOString() === date.toISOString())) {
+				return prev.filter((d) => d.toISOString() !== date.toISOString());
+			}
+			if (prev.length >= parameters.daysAvailable) return prev;
+			return [...prev, date];
 		});
 	};
 
-	useEffect(() => {
-		(async () => {
-			const generatedDaysOff = await calculateDaysOff(
-				parameters?.startDate,
-				parameters?.endDate,
-				BANK_HOLIDAYS,
-				parameters?.daysAvailable
-			);
-			setDaysOff(generatedDaysOff);
-			setLoading(false);
-			return;
-		})();
-	}, [parameters]);
-
-	const allocatedDaysOff = useMemo(() => daysOff.length, [daysOff]);
-
-	const shouldShowCalendar = !loading && parameters?.startDate && parameters?.endDate && parameters?.daysAvailable;
+	const shouldShowCalendar = useMemo(
+		() => !loading && parameters.year && parameters.daysAvailable && parameters.countryCode && daysOff,
+		[loading, parameters, daysOff]
+	);
 
 	return (
-		<div>
-			<div>
-				<SetupControls
-					defaultStartDate={new Date(ACTUAL_DATE.getFullYear(), 0, 1)}
-					defaultEndDate={new Date(ACTUAL_DATE.getFullYear(), 11, 31)}
-					defaultDaysAvailable={20}
-					onSubmit={handleSubmit}
-				/>
-			</div>
-			<div>Allocated days off: {allocatedDaysOff}</div>
-			<div>
-				{shouldShowCalendar && (
-					<Calendar
-						startDate={parameters?.startDate}
-						endDate={parameters?.endDate}
-						bankHolidays={BANK_HOLIDAYS}
-						daysOff={daysOff}
+		<div className="bg-red-100 p-8 text-gray-800 min-h-screen h-fit pb-28">
+			<div className="container mx-auto pt-24 px-4 mb-12 text-left max-w-3xl">
+				<div>
+					<h1 className="text-4xl font-bold text-gray-800	mb-8">Vacation Planner</h1>
+					<p className="mb-8">
+						Lorem ipsum dolor sit amet consectetur adipisicing elit. Facere asperiores cupiditate voluptates iste dolor
+						quos quisquam nemo modi? Temporibus exercitationem labore corrupti porro? Voluptas illum dignissimos sequi,
+						error in ad!
+					</p>
+				</div>
+
+				<div className="border-b-2 border-zinc-800/10 mb-8"></div>
+
+				<div className="mb-8">
+					<SetupControls
+						onSubmit={(data) =>
+							setParameters({
+								year: data.year,
+								daysAvailable: data.daysAvailable,
+								countryCode: data.countryCode,
+							})
+						}
 					/>
-				)}
+				</div>
+			</div>
+			<div className="container mx-auto max-w-3xl">
+				<div>
+					{shouldShowCalendar && (
+						<Calendar
+							year={parameters?.year}
+							publicHolidays={publicHolidays}
+							daysOff={daysOff}
+							onDayClick={handleDayClick}
+							maxDaysOff={parameters.daysAvailable}
+						/>
+					)}
+				</div>
 			</div>
 		</div>
 	);

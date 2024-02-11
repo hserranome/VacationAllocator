@@ -9,9 +9,9 @@ export const WeekdayHeaderRow = () => {
 		[]
 	);
 	return (
-		<tr>
+		<tr className="flex">
 			{localizedWeekdayNames.map((weekdayName) => (
-				<th key={weekdayName} className="weekdayLabel">
+				<th key={weekdayName} className="flex-1 font-medium text-gray-700">
 					{weekdayName}
 				</th>
 			))}

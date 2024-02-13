@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { calculateDaysOff } from "./calculateDaysOff";
+import { calculateDaysOff } from "./calculateDaysOff/calculateDaysOff";
 import { fetchPublicHolidays } from "./fetchPublicHolidays";
 
 interface Parameters {

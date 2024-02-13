@@ -1,2 +1,2 @@
-export * from "./calculateDaysOff";
+export * from "./calculateDaysOff/calculateDaysOff";
 export * from "./useVacationPlanner";

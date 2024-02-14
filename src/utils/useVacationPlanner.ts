@@ -10,7 +10,7 @@ interface Parameters {
 	countryCode: string;
 }
 
-export const useVacationPlanner = (initialParameters: Parameters) => {
+export const useVacationPlanner = (initialParameters?: Parameters) => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [parameters, setParameters] = useState<Parameters>(initialParameters);
 	const [publicHolidays, setPublicHolidays] = useState<Date[]>([]);
@@ -20,15 +20,16 @@ export const useVacationPlanner = (initialParameters: Parameters) => {
 		const fetchDaysOff = async () => {
 			setLoading(true);
 
-			const countryCodePublicHolidays = await fetchPublicHolidays(parameters.year, parameters.countryCode);
-			if (countryCodePublicHolidays) setPublicHolidays(countryCodePublicHolidays);
-
 			try {
 				const yearStart = DateTime.local(parameters.year, 1, 1);
 				const yearEnd = DateTime.local(parameters.year, 12, 31);
-				const forcedDaysOff = datesToDatetime(publicHolidays);
+
+				const countryCodePublicHolidays = await fetchPublicHolidays(parameters.year, parameters.countryCode);
+				const forcedDaysOff = datesToDatetime(countryCodePublicHolidays);
 
 				const generatedDaysOff = await calculateDaysOff(yearStart, yearEnd, forcedDaysOff, parameters.daysAvailable!);
+
+				setPublicHolidays(countryCodePublicHolidays);
 				setDaysOff(dateTimesToJSDates(generatedDaysOff));
 			} catch (error) {
 				console.error("Failed to calculate days off", error);
@@ -38,9 +39,10 @@ export const useVacationPlanner = (initialParameters: Parameters) => {
 			}
 		};
 
-		if (parameters.year && parameters.daysAvailable) {
+		if (parameters.year && parameters.daysAvailable && parameters.countryCode) {
 			fetchDaysOff();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [parameters]);
 
 	return { loading, parameters, setParameters, daysOff, setDaysOff, publicHolidays, setPublicHolidays };

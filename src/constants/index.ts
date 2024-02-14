@@ -4,6 +4,6 @@ export const DAYS_IN_WEEK = 7;
 
 export const INITIAL_PARAMETERS = {
 	year: ACTUAL_DATE.getFullYear(),
-	daysAvailable: 25,
+	daysAvailable: undefined,
 	countryCode: "ES",
 };

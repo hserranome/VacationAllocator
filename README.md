@@ -9,8 +9,6 @@ VacationAllocator is an application designed to help users plan their vacation d
 
 ## To do
 
-- **Deployment**: Deploy the application to a server to make it accessible to the public
-- **Automatic tests**: Add automatic tests to ensure the application works as expected
 - **API alternative**: Find an alternative API to fetch public holidays
 - **Customizable public holidays**: Allow users to specify which days are considered public holidays
 - **Better UI/UX**: Improve the user interface and experience to make the application more intuitive and user-friendly.

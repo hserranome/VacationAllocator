@@ -1,38 +1,38 @@
 import { DateTime, Interval } from "luxon";
-import { getWeekendDaysInInterval } from "./getWeekendDaysInInterval";
-import { filterDatesWithinInterval } from "./filterDatesInInterval";
-import { sortDates } from "./sortDates";
-import { getIntervalsBetweenDates } from "./getIntervalsBetweenDates";
-import { getDatesBetweenIntervals } from "./getDatesBetweenIntervals";
-import { datesToDatetime } from "./datesToDatetime";
+import {
+	filterDatesWithinInterval,
+	getDatesBetweenIntervals,
+	getIntervalsBetweenDates,
+	getWeekendDaysInInterval,
+	sortDates,
+} from "./utils";
+import { allocateElements } from "../allocateElements";
 
 export const calculateDaysOff = (
-	startDate: Date,
-	endDate: Date,
-	forcedDaysOff: Date[],
+	startDate: DateTime,
+	endDate: DateTime,
+	forcedDaysOff: DateTime[],
 	daysToAllocate: number,
 	includeWeekends: boolean = true
-): Date[] => {
+): DateTime[] => {
 	const fullRangeInterval = Interval.fromDateTimes(startDate, endDate);
 	const weekendDays = includeWeekends ? getWeekendDaysInInterval(fullRangeInterval) : [];
-	const forcedDaysOffInRange = filterDatesWithinInterval(datesToDatetime(forcedDaysOff), fullRangeInterval);
+	const forcedDaysOffInRange = filterDatesWithinInterval(forcedDaysOff, fullRangeInterval);
 	const allForcedDaysOff = sortDates([...weekendDays, ...forcedDaysOffInRange]);
 
-	const intervalStart = DateTime.fromJSDate(startDate).minus({ days: 1 });
-	const intervalEnd = DateTime.fromJSDate(endDate).plus({ days: 1 });
-	const allIntervalsDates = [intervalStart, ...allForcedDaysOff, intervalEnd];
+	const allIntervalsDates: DateTime[] = [
+		startDate.minus({ days: 1 }).startOf("day"),
+		...allForcedDaysOff,
+		endDate.plus({ days: 1 }).startOf("day"),
+	];
+
 	const intervalBetweenDays = getIntervalsBetweenDates(allIntervalsDates);
 
 	const arrayOfDatesBetween = getDatesBetweenIntervals(intervalBetweenDays);
 
-	const datesToAllocate = arrayOfDatesBetween.reduce((acc, dates) => {
-		const remainingDays = daysToAllocate - acc.length;
-		if (dates.length <= remainingDays) return [...acc, ...dates];
-		return acc;
-	}, []);
+	const datesToAllocate = allocateElements(arrayOfDatesBetween, daysToAllocate);
 
 	const sortedDatesToAllocate = sortDates(datesToAllocate);
 
-	const jsDates = sortedDatesToAllocate.map((date) => date.toJSDate());
-	return jsDates;
+	return sortedDatesToAllocate;
 };

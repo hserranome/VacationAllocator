@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { calculateDaysOff } from "./calculateDaysOff/calculateDaysOff";
 import { fetchPublicHolidays } from "./fetchPublicHolidays";
+import { DateTime } from "luxon";
+import { dateTimesToJSDates, datesToDatetime } from ".";
 
 interface Parameters {
 	year: number;
@@ -17,20 +19,17 @@ export const useVacationPlanner = (initialParameters: Parameters) => {
 	useEffect(() => {
 		const fetchDaysOff = async () => {
 			setLoading(true);
-			const yearStart = new Date(parameters.year, 0, 1);
-			const yearEnd = new Date(parameters.year, 11, 31);
 
 			const countryCodePublicHolidays = await fetchPublicHolidays(parameters.year, parameters.countryCode);
 			if (countryCodePublicHolidays) setPublicHolidays(countryCodePublicHolidays);
 
 			try {
-				const generatedDaysOff = await calculateDaysOff(
-					yearStart,
-					yearEnd,
-					countryCodePublicHolidays,
-					parameters.daysAvailable!
-				);
-				setDaysOff(generatedDaysOff);
+				const yearStart = DateTime.local(parameters.year, 1, 1);
+				const yearEnd = DateTime.local(parameters.year, 12, 31);
+				const forcedDaysOff = datesToDatetime(publicHolidays);
+
+				const generatedDaysOff = await calculateDaysOff(yearStart, yearEnd, forcedDaysOff, parameters.daysAvailable!);
+				setDaysOff(dateTimesToJSDates(generatedDaysOff));
 			} catch (error) {
 				console.error("Failed to calculate days off", error);
 				// @todo: Handle error appropriately

@@ -25,11 +25,14 @@ export const useVacationPlanner = (initialParameters?: Parameters) => {
 				const yearEnd = DateTime.local(parameters.year, 12, 31);
 
 				const countryCodePublicHolidays = await fetchPublicHolidays(parameters.year, parameters.countryCode);
-				const forcedDaysOff = datesToDatetime(countryCodePublicHolidays);
+				const normalizedPublicHolidays = countryCodePublicHolidays.map((d) =>
+					DateTime.fromJSDate(d).startOf("day").toJSDate()
+				);
+				const forcedDaysOff = datesToDatetime(normalizedPublicHolidays);
 
 				const generatedDaysOff = await calculateDaysOff(yearStart, yearEnd, forcedDaysOff, parameters.daysAvailable!);
 
-				setPublicHolidays(countryCodePublicHolidays);
+				setPublicHolidays(normalizedPublicHolidays);
 				setDaysOff(dateTimesToJSDates(generatedDaysOff));
 			} catch (error) {
 				console.error("Failed to calculate days off", error);

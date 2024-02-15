@@ -42,10 +42,12 @@ const dateIsInArray = (date: Date, dateArray: Date[]): boolean => {
 };
 
 const constructDateFromMonthAndDay = (baseMonth: Date, dayOfMonth: number): Date => {
+	if (!dayOfMonth) return null;
 	return new Date(baseMonth.getFullYear(), baseMonth.getMonth(), dayOfMonth);
 };
 
-const isWeekendDay = (date: Date) => {
+const isWeekendDay = (date: Date | null) => {
+	if (!date) return false;
 	const day = date.getDay();
 	return day === 0 || day === 6;
 };
@@ -63,16 +65,21 @@ export const Calendar = ({ year, publicHolidays, daysOff = [], onDayClick, maxDa
 
 	const isDatePublicHoliday = useCallback((date: Date) => dateIsInArray(date, publicHolidays), [publicHolidays]);
 	const isDateDayOff = useCallback((date: Date) => dateIsInArray(date, daysOff), [daysOff]);
+	const hasDaysToAllocate = useMemo(() => maxDaysOff > daysOff.length, [maxDaysOff, daysOff]);
 
-	const getClassNamesForDate = useCallback(
+	const getDateStyles = useCallback(
 		(date: Date) => {
-			const baseClassNames = "cursor-pointer";
-			if (isDateDayOff(date)) return `${baseClassNames} bg-amber-500 text-white`;
-			if (isDatePublicHoliday(date)) return `${baseClassNames} bg-red-500 text-white`;
-			if (isWeekendDay(date)) return `${baseClassNames} bg-gray-100 text-gray-700`;
-			return `${baseClassNames} text-gray-700`;
+			const classNames = (() => {
+				const baseClassNames = "";
+				if (isDateDayOff(date)) return `${baseClassNames} bg-amber-500 text-white cursor-pointer`;
+				if (isDatePublicHoliday(date)) return `${baseClassNames} bg-red-500 text-white `;
+				if (isWeekendDay(date)) return `${baseClassNames} bg-gray-100 text-gray-700`;
+				if (hasDaysToAllocate) return `${baseClassNames} cursor-pointer`;
+				return `${baseClassNames} text-gray-700`;
+			})();
+			return `flex-1 ${classNames}`;
 		},
-		[isDatePublicHoliday, isDateDayOff]
+		[isDatePublicHoliday, isDateDayOff, hasDaysToAllocate]
 	);
 
 	const allocatedDaysOff = useMemo(() => daysOff.length, [daysOff]);
@@ -116,9 +123,9 @@ export const Calendar = ({ year, publicHolidays, daysOff = [], onDayClick, maxDa
 														const date = constructDateFromMonthAndDay(month, day);
 														return (
 															<td
-																key={`${date.toISOString()}-${i}-day`}
-																className={`flex-1 ${day ? getClassNamesForDate(date) : null}`}
-																onClick={day ? () => handleDayClick(date) : null}
+																key={`${month.getMonth()}-${i}-day`}
+																className={getDateStyles(date)}
+																onClick={() => handleDayClick(date)}
 															>
 																{day}
 															</td>

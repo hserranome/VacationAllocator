@@ -8,7 +8,10 @@ const App = () => {
 	const { loading, parameters, setParameters, daysOff, setDaysOff, publicHolidays } =
 		useVacationPlanner(INITIAL_PARAMETERS);
 
-	const handleDayClick = (date: Date) => {
+	const handleDayClick = (date: Date | null) => {
+		if (!date) return;
+		const dateIsBankHoliday = publicHolidays.some((d) => d.toISOString() === date.toISOString());
+		if (dateIsBankHoliday) return;
 		setDaysOff((prev) => {
 			if (prev.some((d) => d.toISOString() === date.toISOString())) {
 				return prev.filter((d) => d.toISOString() !== date.toISOString());
